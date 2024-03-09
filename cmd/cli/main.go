@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"bufio"
@@ -7,24 +7,29 @@ import (
 	"strings"
 )
 
-type cliCommand struct {
+type command struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*state) error
 }
 
-func StartPrompt() {
+type state struct {
+	LocationNextUrl  *string
+	LocationPrevtUrl *string
+}
+
+func Start() {
+	var st state
 	for {
 		scanner := bufio.NewScanner(os.Stdin)
 		fmt.Printf("Pokedex > ")
 		scanner.Scan()
-		cmd := commands()
-
+		cmd := GetCommand()
 		if c, ok := cmd[strings.ToLower(scanner.Text())]; ok {
-			c.callback()
+			c.callback(&st)
 		} else {
 			fmt.Println("Command not found")
-			cmd["help"].callback()
+			cmd["help"].callback(&st)
 		}
 	}
 }
