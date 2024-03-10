@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/q-sw/go-pokedexcli/internal/pokeCache"
 )
 
 type command struct {
@@ -16,10 +19,12 @@ type command struct {
 type state struct {
 	LocationNextUrl  *string
 	LocationPrevtUrl *string
+	PokeCache        pokecache.Cache
 }
 
 func Start() {
 	var st state
+	st.PokeCache = pokecache.NewCache(time.Duration(time.Millisecond * 500))
 	for {
 		scanner := bufio.NewScanner(os.Stdin)
 		fmt.Printf("Pokedex > ")

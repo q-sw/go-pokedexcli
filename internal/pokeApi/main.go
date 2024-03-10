@@ -2,8 +2,11 @@ package pokeApi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/q-sw/go-pokedexcli/internal/pokeCache"
 )
 
 type PokeLocation struct {
@@ -31,18 +34,23 @@ func getRequest(url string) ([]byte, error) {
 
 }
 
-func GetLocation(url *string) (PokeLocation, error) {
+func GetLocation(url *string, cache pokecache.Cache) (PokeLocation, error) {
 	endpoint := "/location-area"
 	fullUrl := apiUrl + endpoint
 	if url != nil {
 		fullUrl = *url
 	}
 
-	r, err := getRequest(fullUrl)
-	if err != nil {
-		return PokeLocation{}, err
+	r, ok := cache.Get(fullUrl)
+	if !ok {
+		fmt.Println("Not in Cache")
+		var err error
+		r, err = getRequest(fullUrl)
+		if err != nil {
+			return PokeLocation{}, err
+		}
+		cache.Add(fullUrl, r)
 	}
-
 	var locations PokeLocation
 
 	json.Unmarshal(r, &locations)

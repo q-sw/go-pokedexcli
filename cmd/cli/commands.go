@@ -54,7 +54,7 @@ func commandHelp(st *state) error {
 func commandMap(st *state) error {
 	fmt.Println("Location Area in Pokemon World:")
 	fmt.Println()
-	loc, err := pokeApi.GetLocation(st.LocationNextUrl)
+	loc, err := pokeApi.GetLocation(st.LocationNextUrl, st.PokeCache)
 
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func commandMap(st *state) error {
 func commandBMap(st *state) error {
 	fmt.Println("Location Area in Pokemon World:")
 	fmt.Println()
-	loc, err := pokeApi.GetLocation(st.LocationPrevtUrl)
+	loc, err := pokeApi.GetLocation(st.LocationPrevtUrl, st.PokeCache)
 
 	if err != nil {
 		return err
