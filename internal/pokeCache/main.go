@@ -16,14 +16,14 @@ func NewCache(interval time.Duration) Cache {
 		cache: make(map[string]cacheEntry),
 	}
 
-	go newCache.ExpireCache(interval)
+	go newCache.LoopExpireCache(interval)
 
 	return newCache
 }
 
 func (c *Cache) Add(key string, data []byte) {
 	c.cache[key] = cacheEntry{
-		createAt: time.Now(),
+		createAt: time.Now().UTC(),
 		value:    data,
 	}
 }
@@ -33,15 +33,19 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return v.value, ok
 }
 
-func (c *Cache) ExpireCache(interval time.Duration) {
-	intervalTime := time.Now().Add(-interval)
+func (c *Cache) LoopExpireCache(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 
 	for range ticker.C {
-		for k, v := range c.cache {
-			if v.createAt.Before(intervalTime) {
-				delete(c.cache, k)
-			}
+		c.ExpireCache(interval)
+	}
+
+}
+func (c *Cache) ExpireCache(interval time.Duration) {
+	intervalTime := time.Now().UTC().Add(-interval)
+	for k, v := range c.cache {
+		if v.createAt.Before(intervalTime) {
+			delete(c.cache, k)
 		}
 	}
 }
