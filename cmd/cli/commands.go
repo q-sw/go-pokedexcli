@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 
 	"github.com/q-sw/go-pokedexcli/internal/pokeApi"
@@ -34,6 +35,16 @@ func GetCommand() map[string]command {
 			name:        "explore {Location Name}",
 			description: "Explore location and found Pokemon",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch {Pokemon Name}",
+			description: "Cacth a new Pokemon",
+			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inpect {Pokemon Name}",
+			description: "Get information about caught pokemon",
+			callback:    commandInspect,
 		},
 	}
 }
@@ -113,5 +124,61 @@ func commandExplore(st *state, args ...string) error {
 
 	}
 	fmt.Println()
+	return nil
+}
+
+func commandCatch(st *state, args ...string) error {
+	fmt.Println("Catch Pokemon:")
+	fmt.Println()
+	if len(args) == 1 {
+		return errors.New("no pokemon provided to cacth it")
+
+	}
+	pokemon := args[1]
+
+	poke, err := pokeApi.GetPokemon(pokemon, st.PokeCache)
+
+	if err != nil {
+		return errors.New("error during get pokemon")
+	}
+
+	fmt.Printf("%v, %v\n", poke.Name, poke.BaseExperience)
+	chance := rand.Intn(poke.BaseExperience)
+	fmt.Printf("my chance %v\n", chance)
+	if chance < poke.BaseExperience/2 {
+		fmt.Printf("no Chance you failed to catch %s\n", pokemon)
+		return errors.New("no Chance you failed to catch pokemon")
+
+	}
+	fmt.Printf("Congrats you caught %s\n", pokemon)
+	st.PokemonCatch[pokemon] = poke
+	fmt.Println()
+
+	fmt.Printf("My pokemon caught %v\n", st.PokemonCatch)
+
+	return nil
+}
+
+func commandInspect(st *state, args ...string) error {
+	if len(args) == 1 {
+		return errors.New("no pokemon provided to get information")
+	}
+
+	poke, ok := st.PokemonCatch[args[1]]
+	if !ok {
+		return errors.New("you do not have this pokemon")
+	}
+
+	fmt.Println(poke.Name)
+	fmt.Println(poke.Height)
+	fmt.Println(poke.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range poke.Stats {
+		fmt.Printf("- %s: %v\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, t := range poke.Types {
+		fmt.Printf("-%s", t.Type.Name)
+	}
 	return nil
 }

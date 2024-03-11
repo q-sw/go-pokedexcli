@@ -70,3 +70,24 @@ func GetLocationDetails(location string, cache pokecache.Cache) (PokeLocationDet
 
 	return locations, nil
 }
+
+func GetPokemon(name string, cache pokecache.Cache) (Pokemon, error) {
+	endpoint := apiUrl + "/pokemon/" + name
+
+	r, ok := cache.Get(endpoint)
+	if !ok {
+		fmt.Println("Not in Cache")
+		var err error
+		r, err = getRequest(endpoint)
+		if err != nil {
+			fmt.Println("Error in GetLocationDetails request")
+			return Pokemon{}, err
+		}
+		cache.Add(endpoint, r)
+	}
+	var pokemon Pokemon
+
+	json.Unmarshal(r, &pokemon)
+
+	return pokemon, nil
+}

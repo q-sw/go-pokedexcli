@@ -7,12 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/q-sw/go-pokedexcli/internal/pokeApi"
 	pokecache "github.com/q-sw/go-pokedexcli/internal/pokeCache"
 )
 
 func Start() {
 	var st state
 	st.PokeCache = pokecache.NewCache(time.Duration(time.Second * 10))
+	st.PokemonCatch = make(map[string]pokeApi.Pokemon)
 	for {
 		scanner := bufio.NewScanner(os.Stdin)
 		fmt.Printf("Pokedex > ")

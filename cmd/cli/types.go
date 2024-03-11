@@ -1,6 +1,9 @@
 package cli
 
-import pokecache "github.com/q-sw/go-pokedexcli/internal/pokeCache"
+import (
+	pokeApi "github.com/q-sw/go-pokedexcli/internal/pokeApi"
+	pokecache "github.com/q-sw/go-pokedexcli/internal/pokeCache"
+)
 
 type command struct {
 	name        string
@@ -12,4 +15,5 @@ type state struct {
 	LocationNextUrl  *string
 	LocationPrevtUrl *string
 	PokeCache        pokecache.Cache
+	PokemonCatch     map[string]pokeApi.Pokemon
 }
