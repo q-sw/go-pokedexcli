@@ -6,20 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/q-sw/go-pokedexcli/internal/pokeCache"
+	pokecache "github.com/q-sw/go-pokedexcli/internal/pokeCache"
 )
-
-type PokeLocation struct {
-	Count    int      `json:"count"`
-	Next     *string  `json:"next"`
-	Previous *string  `json:"previous"`
-	Results  []Result `json:"results"`
-}
-
-type Result struct {
-	Name string `json:"name"`
-	Url  string `json:"url"`
-}
 
 const apiUrl = "https://pokeapi.co/api/v2"
 
@@ -29,6 +17,10 @@ func getRequest(url string) ([]byte, error) {
 		return []byte{}, err
 	}
 	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return []byte{}, err
+	}
 
 	return body, nil
 
@@ -52,6 +44,27 @@ func GetLocation(url *string, cache pokecache.Cache) (PokeLocation, error) {
 		cache.Add(fullUrl, r)
 	}
 	var locations PokeLocation
+
+	json.Unmarshal(r, &locations)
+
+	return locations, nil
+}
+
+func GetLocationDetails(location string, cache pokecache.Cache) (PokeLocationDetails, error) {
+	endpoint := apiUrl + "/location-area/" + location
+
+	r, ok := cache.Get(endpoint)
+	if !ok {
+		fmt.Println("Not in Cache")
+		var err error
+		r, err = getRequest(endpoint)
+		if err != nil {
+			fmt.Println("Error in GetLocationDetails request")
+			return PokeLocationDetails{}, err
+		}
+		cache.Add(endpoint, r)
+	}
+	var locations PokeLocationDetails
 
 	json.Unmarshal(r, &locations)
 

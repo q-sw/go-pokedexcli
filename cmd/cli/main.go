@@ -7,31 +7,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/q-sw/go-pokedexcli/internal/pokeCache"
+	pokecache "github.com/q-sw/go-pokedexcli/internal/pokeCache"
 )
-
-type command struct {
-	name        string
-	description string
-	callback    func(*state) error
-}
-
-type state struct {
-	LocationNextUrl  *string
-	LocationPrevtUrl *string
-	PokeCache        pokecache.Cache
-}
 
 func Start() {
 	var st state
-	st.PokeCache = pokecache.NewCache(time.Duration(time.Millisecond * 500))
+	st.PokeCache = pokecache.NewCache(time.Duration(time.Second * 10))
 	for {
 		scanner := bufio.NewScanner(os.Stdin)
 		fmt.Printf("Pokedex > ")
 		scanner.Scan()
 		cmd := GetCommand()
-		if c, ok := cmd[strings.ToLower(scanner.Text())]; ok {
-			c.callback(&st)
+		cmdName := strings.Split(scanner.Text(), " ")
+		if c, ok := cmd[strings.ToLower(cmdName[0])]; ok {
+			c.callback(&st, cmdName...)
 		} else {
 			fmt.Println("Command not found")
 			cmd["help"].callback(&st)

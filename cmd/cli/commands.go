@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -29,16 +30,21 @@ func GetCommand() map[string]command {
 			description: "Get previous Location area in Pokemon World",
 			callback:    commandBMap,
 		},
+		"explore": {
+			name:        "explore {Location Name}",
+			description: "Explore location and found Pokemon",
+			callback:    commandExplore,
+		},
 	}
 }
 
-func commandExit(st *state) error {
+func commandExit(st *state, args ...string) error {
 	fmt.Println("Goodbye !!!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(st *state) error {
+func commandHelp(st *state, args ...string) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex! \nUsage:")
 
@@ -51,7 +57,7 @@ func commandHelp(st *state) error {
 	return nil
 }
 
-func commandMap(st *state) error {
+func commandMap(st *state, args ...string) error {
 	fmt.Println("Location Area in Pokemon World:")
 	fmt.Println()
 	loc, err := pokeApi.GetLocation(st.LocationNextUrl, st.PokeCache)
@@ -70,7 +76,7 @@ func commandMap(st *state) error {
 	return nil
 }
 
-func commandBMap(st *state) error {
+func commandBMap(st *state, args ...string) error {
 	fmt.Println("Location Area in Pokemon World:")
 	fmt.Println()
 	loc, err := pokeApi.GetLocation(st.LocationPrevtUrl, st.PokeCache)
@@ -85,6 +91,27 @@ func commandBMap(st *state) error {
 	}
 	st.LocationNextUrl = loc.Next
 	st.LocationPrevtUrl = loc.Previous
+	fmt.Println()
+	return nil
+}
+func commandExplore(st *state, args ...string) error {
+	fmt.Println("Pokemon in Location:")
+	fmt.Println()
+	if len(args) == 1 {
+		return errors.New("no location provided to explore")
+
+	}
+	location := args[1]
+
+	loc, err := pokeApi.GetLocationDetails(location, st.PokeCache)
+
+	if err != nil {
+		return errors.New("error during get locationdetails")
+	}
+	for _, l := range loc.PokemonEncounters {
+		fmt.Printf("\t- %s\n", l.Pokemon.Name)
+
+	}
 	fmt.Println()
 	return nil
 }
