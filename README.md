@@ -1,6 +1,6 @@
 # go-pokedexcli
 
-To improve my knowledge and dev skills, I subscribe to [boot.dev](https://www.boot.dev/).
+To improve my knowledge and dev skills, I subscribed to [boot.dev](https://www.boot.dev/).
 I followed the Golang Course and realized the project PokedexCLI.
 
 This repository is the result of this project.
