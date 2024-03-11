@@ -46,6 +46,11 @@ func GetCommand() map[string]command {
 			description: "Get information about caught pokemon",
 			callback:    commandInspect,
 		},
+		"pokedex": {
+			name:        "inpect {Pokemon Name}",
+			description: "Get information about caught pokemon",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -154,8 +159,6 @@ func commandCatch(st *state, args ...string) error {
 	st.PokemonCatch[pokemon] = poke
 	fmt.Println()
 
-	fmt.Printf("My pokemon caught %v\n", st.PokemonCatch)
-
 	return nil
 }
 
@@ -179,6 +182,17 @@ func commandInspect(st *state, args ...string) error {
 	fmt.Println("Types:")
 	for _, t := range poke.Types {
 		fmt.Printf("-%s", t.Type.Name)
+	}
+	return nil
+}
+
+func commandPokedex(st *state, args ...string) error {
+
+	fmt.Println("Pokemon Catch:")
+	fmt.Println()
+	for _, pokemon := range st.PokemonCatch {
+
+		fmt.Printf("- %s\n", pokemon.Name)
 	}
 	return nil
 }
